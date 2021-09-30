@@ -5,6 +5,6 @@ entries:
       description: Deploy a sip crd pod      
       name: eric-sec-sip-tls-crd
       urls:
-      - https://github.com/jagan4ru/eai-19-repo/blob/main/eric-sec-sip-tls-crd/eric-sec-sip-tls-crd-2.2.0+30.tgz
-      version: 2.2.0+30
+      - https://github.com/jagan4ru/eai-19-repo/blob/main/eric-sec-sip-tls-crd/eric-sec-sip-tls-crd-2.2.0.tgz        
+      version: 2.2.0
 generated: "2021-09-30T13:45:36.106510817+05:30"
