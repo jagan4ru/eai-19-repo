@@ -1,0 +1,5 @@
+{{- define "eric-sec-sip-tls-crd.product-info" -}}
+ericsson.com/product-name: "Service Identity Provider TLS CRD"
+ericsson.com/product-number: "CXC 174 2970"
+ericsson.com/product-revision: "2.2.0"
+{{- end -}}

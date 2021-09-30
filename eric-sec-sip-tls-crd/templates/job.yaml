@@ -1,0 +1,53 @@
+{{ if or (.Values.waitForCustomResourcesPublished) (eq (.Values.waitForCustomResourcesPublished | toString) "<nil>" ) }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "eric-sec-sip-tls-crd.name" . }}
+  labels:
+    {{- include "eric-sec-sip-tls-crd.labels" . | nindent 4 }}
+  annotations:
+    {{- include "eric-sec-sip-tls-crd.product-info" . | nindent 4 }}
+    "helm.sh/hook": post-install, post-upgrade
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  template:
+    metadata:
+      labels:
+        {{- include "eric-sec-sip-tls-crd.labels" . | nindent 8 }}
+      annotations:
+        {{- include "eric-sec-sip-tls-crd.product-info" . | nindent 8 }}
+    spec:
+      restartPolicy: OnFailure
+      {{- if .Values.persistence }}
+        {{- if .Values.persistence.type }}
+          {{- if eq .Values.persistence.type "pvc" }}
+      securityContext:
+        fsGroup: {{ include "eric-sec-sip-tls-crd.fsGroup.coordinated" . }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+      containers:
+      - name: crdjob
+        image: {{ include "eric-sec-sip-tls-crd.registryUrlPath" . }}/{{ .Values.images.crdjob.name }}:{{ .Values.images.crdjob.tag }}
+        imagePullPolicy: {{ template "eric-sec-sip-tls-crd.imagePullPolicy" . }}
+        command: ["./crd-scripts/check_crds.bash"]
+        env:
+          - name: SERVICE_NAME
+            value: {{ template "eric-sec-sip-tls-crd.name" . }}
+          - name: LOG_LEVEL
+            value: {{ .Values.logLevel }}
+        volumeMounts:
+          - name: scripts
+            mountPath: /crd-scripts
+      serviceAccountName: {{ template "eric-sec-sip-tls-crd.name" . }}-service-account
+      volumes:
+        - name: scripts
+          configMap:
+            name: {{ template "eric-sec-sip-tls-crd.name" . }}-config
+            defaultMode: 0777
+      {{- if include "eric-sec-sip-tls-crd.pullSecrets" . }}
+      imagePullSecrets:
+        - name: {{ template "eric-sec-sip-tls-crd.pullSecrets" . }}
+      {{- end }}
+{{- end }} 
